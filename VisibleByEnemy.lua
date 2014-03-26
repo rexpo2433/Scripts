@@ -1,39 +1,10 @@
-eff = {}
- 
-function Tick()
- 
-        if not client.connected or client.loading or client.console or not entityList:GetMyHero() then return end
- 
-                me = entityList:GetMyHero()
-                        hero = entityList:FindEntities({type=LuaEntity.TYPE_HERO, alive = true, illusion = false})
-                        for i, v in ipairs(hero) do OnScreen = client:ScreenPosition(v.position)       
-                                if OnScreen and v.team == me.team then
-                               
-                                        if v.name == me.name then
-                                                effect = "aura_shivas"
-                                        else
-                                                effect = "ambient_gizmo_model"
-                                        end
-                                       
-                                        if eff[v.handle] == nil then
-                                                if v:GetProperty("CDOTA_BaseNPC","m_iTaggedAsVisibleByTeam") == 30 then                                            
-                                                        eff[v.handle] = Effect(v,effect)
-                                                        eff[v.handle]:SetVector(1,Vector(0,0,0))
-                                                end
-                                        elseif v:GetProperty("CDOTA_BaseNPC","m_iTaggedAsVisibleByTeam") ~= 30 and eff[v.handle] ~= nil then
-                                                eff[v.handle] = nil
-                                                collectgarbage("collect")                                      
-                                        end                                    
-                                end
-                        end
- 
+text = drawMgr:CreateText(client.screenSize.x/2.07,client.screenSize.y/17,0xD10A0A80,"Visible",drawMgr:CreateFont("manabarsFont","Arial",26,600))
+text.visible = false
+
+function Frame() 
+	if not client.connected or client.loading or client.console or not entityList:GetMyHero() then return end 
+	local me = entityList:GetMyHero()	   
+	if me.visibleToEnemy then text.visible = true else text.visible = false end       
 end
  
-function GameClose()
-        eff = {}
-        collectgarbage("collect")
-end
- 
- 
-script:RegisterEvent(EVENT_CLOSE, GameClose)
-script:RegisterEvent(EVENT_TICK,Tick)
+script:RegisterEvent(EVENT_TICK,Frame)
